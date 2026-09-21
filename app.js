@@ -13,7 +13,6 @@ import { render as renderVehicleIntelligence, init as initVehicleIntelligence } 
 import { render as renderTrafficAnalytics, init as initTrafficAnalytics } from './pages/traffic-analytics.js';
 import { render as renderAlerts, init as initAlerts }                     from './pages/alerts.js';
 import { render as renderAuditLog, init as initAuditLog }                 from './pages/audit-log.js';
-import { render as renderAnomalyDetection, init as initAnomalyDetection } from './pages/anomaly-detection.js';
 
 // ===== Routes =====
 const routes = {
@@ -23,7 +22,6 @@ const routes = {
     'vehicle-tracking':     { title: 'VEHICLE TRACKING',     render: renderVehicleTracking,    init: initVehicleTracking },
     'vehicle-intelligence': { title: 'VEHICLE INTELLIGENCE', render: renderVehicleIntelligence, init: initVehicleIntelligence },
     'traffic-analytics':    { title: 'TRAFFIC ANALYTICS',    render: renderTrafficAnalytics,   init: initTrafficAnalytics },
-    'anomaly-detection':    { title: 'ANOMALY DETECTION',    render: renderAnomalyDetection,   init: initAnomalyDetection },
     'alerts':               { title: 'ALERTS',               render: renderAlerts,             init: initAlerts },
     'audit-log':            { title: 'AUDIT LOG',            render: renderAuditLog,           init: initAuditLog },
 };

@@ -23,10 +23,18 @@ export function render(params) {
             <div class="flex justify-between items-center w-full">
                 <div>
                     <div class="vehicle-plate-display text-2xl font-bold mono mb-12 text-primary" style="font-size: 2rem;">${plate}</div>
-                    <div class="vehicle-details-grid grid-2 gap-12 mt-12 text-sm" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    <div class="vehicle-details-grid grid-2 gap-12 mt-12 text-sm" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
                         <div class="vehicle-detail-item flex flex-col gap-4">
                             <span class="vehicle-detail-label text-secondary text-xs uppercase">Vehicle Type</span>
                             <span class="vehicle-detail-value font-medium">${type}</span>
+                        </div>
+                        <div class="vehicle-detail-item flex flex-col gap-4">
+                            <span class="vehicle-detail-label text-secondary text-xs uppercase">Registration Type</span>
+                            <span class="vehicle-detail-value font-medium">${vData.registrationType || 'Personal'}</span>
+                        </div>
+                        <div class="vehicle-detail-item flex flex-col gap-4">
+                            <span class="vehicle-detail-label text-secondary text-xs uppercase">Fuel / Propulsion</span>
+                            <span class="vehicle-detail-value font-medium">${vData.fuelType || 'Petrol'}</span>
                         </div>
                         <div class="vehicle-detail-item flex flex-col gap-4">
                             <span class="vehicle-detail-label text-secondary text-xs uppercase">Color</span>
