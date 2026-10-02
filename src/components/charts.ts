@@ -1,10 +1,9 @@
 /* ============================================================
-   EagleEye – Shared Chart.js Helpers
+   EagleEye – Shared Chart.js Helpers – React Version
    ============================================================ */
 
-/**
- * Get chart colors based on current theme
- */
+declare const Chart: any;
+
 function getChartColors() {
     const style = getComputedStyle(document.documentElement);
     return {
@@ -19,9 +18,6 @@ function getChartColors() {
     };
 }
 
-/**
- * Common chart defaults
- */
 function getDefaults() {
     const c = getChartColors();
     return {
@@ -58,14 +54,10 @@ function getDefaults() {
     };
 }
 
-// Track active charts for theme updates
-const activeCharts = new Map();
+const activeCharts = new Map<string, any>();
 
-/**
- * Create a line/area chart.
- */
-export function createLineChart(canvasId, labels, data, options = {}) {
-    const canvas = document.getElementById(canvasId);
+export function createLineChart(canvasId: string, labels: string[], data: number[], options: any = {}) {
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
     if (!canvas) return null;
 
     if (activeCharts.has(canvasId)) {
@@ -102,11 +94,8 @@ export function createLineChart(canvasId, labels, data, options = {}) {
     return chart;
 }
 
-/**
- * Create a horizontal bar chart.
- */
-export function createHorizontalBarChart(canvasId, labels, data, colors, options = {}) {
-    const canvas = document.getElementById(canvasId);
+export function createHorizontalBarChart(canvasId: string, labels: string[], data: number[], colors: string[], options: any = {}) {
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
     if (!canvas) return null;
 
     if (activeCharts.has(canvasId)) {
@@ -146,11 +135,8 @@ export function createHorizontalBarChart(canvasId, labels, data, colors, options
     return chart;
 }
 
-/**
- * Create a vertical bar chart.
- */
-export function createBarChart(canvasId, labels, data, options = {}) {
-    const canvas = document.getElementById(canvasId);
+export function createBarChart(canvasId: string, labels: string[], data: number[], options: any = {}) {
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
     if (!canvas) return null;
 
     if (activeCharts.has(canvasId)) {
@@ -184,11 +170,8 @@ export function createBarChart(canvasId, labels, data, options = {}) {
     return chart;
 }
 
-/**
- * Create a doughnut chart.
- */
-export function createDoughnutChart(canvasId, labels, data, colors, options = {}) {
-    const canvas = document.getElementById(canvasId);
+export function createDoughnutChart(canvasId: string, labels: string[], data: number[], colors: string[], options: any = {}) {
+    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
     if (!canvas) return null;
 
     if (activeCharts.has(canvasId)) {
@@ -221,18 +204,9 @@ export function createDoughnutChart(canvasId, labels, data, colors, options = {}
     return chart;
 }
 
-/**
- * Destroy a chart by canvas ID.
- */
-export function destroyChart(canvasId) {
+export function destroyChart(canvasId: string) {
     if (activeCharts.has(canvasId)) {
         activeCharts.get(canvasId).destroy();
         activeCharts.delete(canvasId);
     }
 }
-
-// Re-render charts on theme change
-window.addEventListener('theme-changed', () => {
-    // Charts need to be re-created by each page's init function
-    // This event just notifies — pages should listen and re-init
-});

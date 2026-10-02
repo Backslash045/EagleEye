@@ -76,7 +76,7 @@ for (let i = 49; i <= 256; i++) {
         lat: 22.45 + Math.random() * 0.25,
         lng: 88.28 + Math.random() * 0.25,
         status: isOffline ? 'offline' : isDegraded ? 'degraded' : 'online',
-        uptime: isOffline ? 0 : isDegraded ? (70 + Math.random() * 15).toFixed(1) : (95 + Math.random() * 4.9).toFixed(1),
+        uptime: isOffline ? 0 : isDegraded ? parseFloat((70 + Math.random() * 15).toFixed(1)) : parseFloat((95 + Math.random() * 4.9).toFixed(1)),
         lastDetection: isOffline ? `${Math.floor(1 + Math.random() * 12)} hrs ago` : `${Math.floor(1 + Math.random() * 10)} min ago`,
     });
 }
@@ -259,7 +259,7 @@ export const TRAFFIC = {
         { hour: '18:00', volume: 7200 }, { hour: '19:00', volume: 5900 }, { hour: '20:00', volume: 4100 },
         { hour: '21:00', volume: 2800 }, { hour: '22:00', volume: 1800 },
     ],
-    heatmapPoints: [], // Generated below
+    heatmapPoints: [] as number[][], // Generated below
     originDestination: [
         { origin: 'Howrah',   destination: 'Salt Lake',   trips: 1240, avgTime: '52 min', oLat: 22.5958, oLng: 88.3425, dLat: 22.5804, dLng: 88.4169 },
         { origin: 'Dum Dum',  destination: 'Esplanade',   trips: 980,  avgTime: '41 min', oLat: 22.6227, oLng: 88.4050, dLat: 22.5636, dLng: 88.3521 },
@@ -511,7 +511,8 @@ TRAFFIC.heatmapPoints = [
 
 // Add spread points around each hotspot for smoother heatmap coverage
 const basePoints = [...TRAFFIC.heatmapPoints];
-basePoints.forEach(([lat, lng, intensity]) => {
+basePoints.forEach((point) => {
+    const [lat, lng, intensity] = point;
     // Add 3-5 surrounding points at lower intensity for gradient effect
     const spread = intensity > 0.8 ? 5 : intensity > 0.6 ? 4 : 3;
     for (let j = 0; j < spread; j++) {
@@ -554,6 +555,8 @@ export const VEHICLE_INTELLIGENCE = {
         vehicleType: 'Sedan',
         color: 'Silver',
         make: 'Maruti Ciaz',
+        registrationType: 'Personal',
+        fuelType: 'Petrol',
         firstSeen: '02 Sep 2026',
         lastSeen: '14 Sep 2026',
         totalSightings: 142,
@@ -573,4 +576,51 @@ export const VEHICLE_INTELLIGENCE = {
             'Gariahat → Ballygunge → Esplanade → Howrah',
         ],
     },
+    'WB 02 YX 1122': {
+        plate: 'WB 02 YX 1122',
+        vehicleType: 'SUV',
+        color: 'White',
+        make: 'Tata Nexon EV',
+        registrationType: 'Personal',
+        fuelType: 'Electric (EV)',
+        firstSeen: '08 Sep 2026',
+        lastSeen: '21 Sep 2026',
+        totalSightings: 85,
+        flagged: false,
+        watchlist: true,
+        zones: {
+            'East': 40, 'Central': 25, 'South': 15, 'North': 5, 'Southwest': 0,
+        },
+        hourlyPattern: [0,0,0,0,0,0,1,5,20,30,15,10,8,5,8,12,25,35,10,5,2,0,0,0],
+        alerts: [
+            { type: 'wrong_dir', reason: 'Wrong Direction – Contraflow', time: '08:45 AM today', severity: 'warning' },
+        ],
+        recentRoutes: [
+            'Salt Lake Sector V → EM Bypass → Park Circus',
+            'New Town Biswa Bangla → Ultadanga → Sealdah',
+        ],
+    },
 };
+
+// ===== Anomaly Detection Database (Mocked for Partial Search) =====
+export const ANOMALY_DATABASE = [
+    { plate: 'WB 02 AB 7067', vehicleType: 'Sedan', make: 'Honda City', color: 'White', registrationType: 'Personal', fuelType: 'Petrol' },
+    { plate: 'WB 02 AC 7067', vehicleType: 'SUV', make: 'Toyota Fortuner', color: 'Black', registrationType: 'Personal', fuelType: 'Diesel' },
+    { plate: 'WB 02 AZ 7067', vehicleType: 'Hatchback', make: 'Tata Tiago', color: 'Red', registrationType: 'Personal', fuelType: 'EV' },
+    { plate: 'WB 26 AE 7834', vehicleType: 'Sedan', make: 'Maruti Ciaz', color: 'Silver', registrationType: 'Personal', fuelType: 'Petrol' },
+    { plate: 'WB 14 CD 9021', vehicleType: 'SUV', make: 'Hyundai Creta', color: 'Black', registrationType: 'Commercial', fuelType: 'Diesel' },
+    { plate: 'WB 02 BX 1456', vehicleType: 'Hatchback', make: 'Tata Altroz', color: 'White', registrationType: 'Personal', fuelType: 'Hybrid' },
+    { plate: 'MH 12 AB 6690', vehicleType: 'SUV', make: 'Mahindra XUV700', color: 'Blue', registrationType: 'Personal', fuelType: 'Diesel' },
+    { plate: 'DL 08 CQ 7723', vehicleType: 'Sedan', make: 'Skoda Slavia', color: 'Silver', registrationType: 'Personal', fuelType: 'Petrol' },
+    { plate: 'KA 05 MN 2213', vehicleType: 'Hatchback', make: 'Maruti Swift', color: 'Red', registrationType: 'Personal', fuelType: 'CNG' },
+    { plate: 'WB 41 FG 3302', vehicleType: 'Bike', make: 'Royal Enfield Classic', color: 'Black', registrationType: 'Personal', fuelType: 'Petrol' },
+    { plate: 'WB 09 HK 6678', vehicleType: 'Truck', make: 'Tata Signa', color: 'Yellow', registrationType: 'Commercial', fuelType: 'Diesel' },
+    { plate: 'WB 19 TU 5587', vehicleType: 'Sedan', make: 'BMW 3 Series', color: 'White', registrationType: 'Diplomatic', fuelType: 'Hybrid' },
+    { plate: 'WB 72 RS 4450', vehicleType: 'Bus', make: 'Ashok Leyland', color: 'Green', registrationType: 'Commercial', fuelType: 'CNG' },
+    { plate: 'WB 55 WX 1198', vehicleType: 'SUV', make: 'Kia Seltos', color: 'Grey', registrationType: 'Personal', fuelType: 'Petrol' },
+    { plate: 'WB 87 YZ 3345', vehicleType: 'Hatchback', make: 'Hyundai i20', color: 'Blue', registrationType: 'Temporary', fuelType: 'Petrol' },
+    { plate: 'WB 02 YX 1122', vehicleType: 'SUV', make: 'Tata Nexon', color: 'White', registrationType: 'Personal', fuelType: 'EV' },
+    { plate: 'WB 02 AB 1234', vehicleType: 'Sedan', make: 'Maruti Dzire', color: 'White', registrationType: 'Commercial', fuelType: 'CNG' },
+    { plate: 'WB 12 AB 9967', vehicleType: 'SUV', make: 'Tata Safari', color: 'Black', registrationType: 'Personal', fuelType: 'Diesel' },
+    { plate: 'WB 12 AB 1267', vehicleType: 'Sedan', make: 'Honda Amaze', color: 'Silver', registrationType: 'Commercial', fuelType: 'CNG' },
+];

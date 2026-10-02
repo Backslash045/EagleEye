@@ -1,12 +1,14 @@
 /* ============================================================
-   EagleEye – Shared Map Helpers (Google Maps)
+   EagleEye – Shared Map Helpers (Google Maps) – React Version
    ============================================================ */
+
+declare const google: any;
 
 const KOLKATA_CENTER = { lat: 22.5726, lng: 88.3639 };
 const DEFAULT_ZOOM = 12;
 
 // Track all active maps for theme switching & cleanup
-const activeMaps = new Map();
+const activeMaps = new Map<string, { map: any; overlays: any[] }>();
 
 /* ---------- Dark Theme Styles ---------- */
 const DARK_STYLE = [
@@ -39,32 +41,23 @@ const LIGHT_STYLE = [
 ];
 
 function getThemeStyles() {
-    const theme = document.documentElement.getAttribute('data-theme') || 'light';
+    const theme = document.documentElement.getAttribute('data-theme') || 'dark';
     return theme === 'dark' ? DARK_STYLE : LIGHT_STYLE;
 }
 
-/**
- * Create a Google Map in the given container.
- * @param {string} containerId - DOM element ID
- * @param {object} options - { center: [lat, lng], zoom }
- * @returns {google.maps.Map}
- */
-export function createMap(containerId, options = {}) {
+export function createMap(containerId: string, options: any = {}) {
     const container = document.getElementById(containerId);
     if (!container) return null;
 
-    // Cleanup existing map on this container
     if (activeMaps.has(containerId)) {
-        const prev = activeMaps.get(containerId);
-        // Clear all overlays
-        if (prev.overlays) prev.overlays.forEach(o => {
+        const prev = activeMaps.get(containerId)!;
+        if (prev.overlays) prev.overlays.forEach((o: any) => {
             if (o.setMap) o.setMap(null);
         });
         activeMaps.delete(containerId);
         container.innerHTML = '';
     }
 
-    // Normalize center: accept [lat, lng] array or { lat, lng } object
     let center = KOLKATA_CENTER;
     if (options.center) {
         center = Array.isArray(options.center)
@@ -84,11 +77,9 @@ export function createMap(containerId, options = {}) {
         gestureHandling: 'greedy',
     });
 
-    // Store for theme switching
     activeMaps.set(containerId, { map, overlays: [] });
 
-    // Add compatibility method: flyTo (matches Leaflet API)
-    map.flyTo = function (center, zoom, opts) {
+    map.flyTo = function (center: any, zoom: number, _opts?: any) {
         const latLng = Array.isArray(center)
             ? { lat: center[0], lng: center[1] }
             : center;
@@ -99,37 +90,27 @@ export function createMap(containerId, options = {}) {
     return map;
 }
 
-/**
- * Track an overlay for cleanup/theme-switching.
- */
-function trackOverlay(containerId, overlay) {
+function trackOverlay(containerId: string, overlay: any) {
     if (activeMaps.has(containerId)) {
-        activeMaps.get(containerId).overlays.push(overlay);
+        activeMaps.get(containerId)!.overlays.push(overlay);
     }
 }
 
-function getContainerId(map) {
+function getContainerId(map: any): string | null {
     for (const [id, entry] of activeMaps) {
         if (entry.map === map) return id;
     }
     return null;
 }
 
-/**
- * Add numbered trajectory markers + polyline to a map.
- * @param {google.maps.Map} map
- * @param {Array} sightings - [{ seq, lat, lng, camera, location, timestamp, confidence }]
- * @returns {{ polyline, markers }}
- */
-export function addTrajectory(map, sightings) {
+export function addTrajectory(map: any, sightings: any[], _animate?: boolean) {
     const containerId = getContainerId(map);
-    const path = sightings.map(s => ({ lat: s.lat, lng: s.lng }));
-    const markers = [];
+    const path = sightings.map((s: any) => ({ lat: s.lat, lng: s.lng }));
+    const markers: any[] = [];
 
     const accentColor = getComputedStyle(document.documentElement)
         .getPropertyValue('--accent').trim() || '#2563eb';
 
-    // Polyline
     const polyline = new google.maps.Polyline({
         path: path,
         geodesic: true,
@@ -140,11 +121,9 @@ export function addTrajectory(map, sightings) {
     });
     if (containerId) trackOverlay(containerId, polyline);
 
-    // Info window (shared)
     const infoWindow = new google.maps.InfoWindow();
 
-    // Numbered markers
-    sightings.forEach((s, i) => {
+    sightings.forEach((s: any, i: number) => {
         const marker = new google.maps.Marker({
             position: { lat: s.lat, lng: s.lng },
             map: map,
@@ -182,12 +161,10 @@ export function addTrajectory(map, sightings) {
         if (containerId) trackOverlay(containerId, marker);
     });
 
-    // Fit bounds
     if (path.length > 0) {
         const bounds = new google.maps.LatLngBounds();
-        path.forEach(p => bounds.extend(p));
+        path.forEach((p: any) => bounds.extend(p));
         map.fitBounds(bounds, { top: 40, right: 40, bottom: 40, left: 40 });
-        // Prevent over-zoom
         google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
             if (map.getZoom() > 14) map.setZoom(14);
         });
@@ -196,18 +173,12 @@ export function addTrajectory(map, sightings) {
     return { polyline, markers };
 }
 
-/**
- * Add camera markers (small colored dots) to a map.
- * @param {google.maps.Map} map
- * @param {Array} cameras - [{ lat, lng, status, id, name, uptime }]
- * @returns {google.maps.Marker[]}
- */
-export function addCameraMarkers(map, cameras) {
+export function addCameraMarkers(map: any, cameras: any[]) {
     const containerId = getContainerId(map);
-    const markers = [];
+    const markers: any[] = [];
     const infoWindow = new google.maps.InfoWindow();
 
-    cameras.forEach(cam => {
+    cameras.forEach((cam: any) => {
         const statusColor = cam.status === 'online' ? '#10b981'
             : cam.status === 'degraded' ? '#f59e0b' : '#ef4444';
 
@@ -246,17 +217,10 @@ export function addCameraMarkers(map, cameras) {
     return markers;
 }
 
-/**
- * Add a heatmap layer to the map.
- * @param {google.maps.Map} map
- * @param {Array} points - [[lat, lng, intensity], ...]
- * @returns {google.maps.visualization.HeatmapLayer}
- */
-export function addHeatmap(map, points) {
+export function addHeatmap(map: any, points: any[]) {
     const containerId = getContainerId(map);
 
-    // Google Maps HeatmapLayer works better with larger weight values
-    const data = points.map(p => ({
+    const data = points.map((p: any) => ({
         location: new google.maps.LatLng(p[0], p[1]),
         weight: (p[2] || 0.5) * 10,
     }));
@@ -282,16 +246,11 @@ export function addHeatmap(map, points) {
     return heatmap;
 }
 
-/**
- * Add congestion bottleneck indicators to the map.
- * @param {google.maps.Map} map
- * @param {Array} bottlenecks - [{ lat, lng, name, delay, severity }]
- */
-export function addBottlenecks(map, bottlenecks) {
+export function addBottlenecks(map: any, bottlenecks: any[]) {
     const containerId = getContainerId(map);
     const infoWindow = new google.maps.InfoWindow();
 
-    bottlenecks.forEach(b => {
+    bottlenecks.forEach((b: any) => {
         const color = b.severity === 'high' ? '#ef4444' : '#f59e0b';
 
         const circle = new google.maps.Circle({
@@ -321,33 +280,28 @@ export function addBottlenecks(map, bottlenecks) {
     });
 }
 
-/**
- * Remove an array of markers/overlays from the map.
- * @param {Array} overlays - array of google.maps.Marker, Polyline, Circle, etc.
- */
-export function clearOverlays(overlays) {
+export function clearOverlays(overlays: any[]) {
     if (!overlays) return;
-    overlays.forEach(o => {
+    overlays.forEach((o: any) => {
         if (o && o.setMap) o.setMap(null);
     });
 }
 
-/**
- * Cleanup: destroy a map and all its overlays.
- */
-export function destroyMap(containerId) {
+export function destroyMap(containerId: string) {
     if (activeMaps.has(containerId)) {
-        const entry = activeMaps.get(containerId);
-        if (entry.overlays) entry.overlays.forEach(o => { if (o.setMap) o.setMap(null); });
+        const entry = activeMaps.get(containerId)!;
+        if (entry.overlays) entry.overlays.forEach((o: any) => { if (o.setMap) o.setMap(null); });
         activeMaps.delete(containerId);
     }
 }
 
 // ===== Theme Change Listener =====
-window.addEventListener('theme-changed', (e) => {
-    const theme = e.detail.theme;
+window.addEventListener('theme-changed', (e: any) => {
+    const theme = e.detail?.theme || 'dark';
     const styles = theme === 'dark' ? DARK_STYLE : LIGHT_STYLE;
     activeMaps.forEach(({ map }) => {
-        map.setOptions({ styles: styles });
+        if (map && map.setOptions) {
+            map.setOptions({ styles: styles });
+        }
     });
 });
